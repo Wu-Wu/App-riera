@@ -1,0 +1,21 @@
+---
+:backends:
+   - redis
+
+:logger: console
+
+:hierarchy:
+   - %{environment}/%{fqdn}
+   - modules/%{calling_module}
+   - global
+
+:yaml:
+   :datadir: /usr/local/etc/puppet/hieradata
+
+:puppet:
+   :datasource: vars
+
+:redis:
+   :host: redi.example.com
+   :port: 6379
+   :db: 3
