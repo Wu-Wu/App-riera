@@ -150,6 +150,7 @@ sub from_yaml {
         }
     }
 
+    1; # OK
 }
 
 #
