@@ -21,6 +21,7 @@ GetOptions(
     'filename|f=s'  => \$args->{'filename'},
     'dump|d'        => \$args->{'dump'},
     'restore|r'     => \$args->{'restore'},
+    'version|v'     => \$args->{'version'},
     'help|h|?'      => \$args->{'help'},
 );
 
@@ -45,3 +46,75 @@ else {
 }
 
 1;
+
+=head1 NAME
+
+riera - A tool to dump/restore redis-driven Hiera database
+
+=head1 SYNOPSIS
+
+    $ riera -c /etc/puppet/hiera.yaml --filename=/data/backups/riera.yaml -d
+    $ riera --config=/etc/puppet/hiera.yaml -f /data/backups/riera.yaml -r
+
+=head1 DESCRIPTION
+
+F<riera> is a CLI tool to dump and restore redis-driven Hiera database. It reads Hiera's configuration file and
+uses Redis settings to perform operations on data located at Redis database.
+
+=head1 COMMAND LINE OPTIONS
+
+=over
+
+=item --config | -c
+
+Path to Hiera configuration file. Usually it resides at Puppet directory (e.g. C</etc/puppet/hiera.yaml>).
+Required parameter.
+
+=item --dump | -d
+
+Indicates operation of dump on data. Boolean. Default value is true. In case of both flags (dump and restore) are
+passed to the script, restore flag will be chosen.
+
+=item --restore | -r
+
+Indicates operation of restore on data. Boolean. Default value is false. This one will be chosen in case of both
+flags (dump and restore) are passed to the script.
+
+B<Warning! This operation will clean Hiera database (by sending flushdb redis command) prior to restore it from
+provided file>.
+
+=item --filename | -f
+
+Path to file to store Hiera database (in case of B<--dump> operation) or to gather Hiera database
+(in case of B<--restore> operation). Required parameter.
+
+=item --version | -v
+
+Print out version information and exits.
+
+=item --help | -h | -?
+
+Print out version and usage information and exits.
+
+=back
+
+=head1 SEE ALSO
+
+L<Redis>
+
+L<YAML>
+
+L<Lightweight Pluggable Hierarchical Database|http://projects.puppetlabs.com/projects/hiera/>
+
+=head1 AUTHOR
+
+Anton Gerasimov, E<lt>chim@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Anton Gerasimov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

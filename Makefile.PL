@@ -25,7 +25,6 @@ my %options = (
         'IO::File'     => 0,
         'YAML'         => 0,
         'Carp'         => 0,
-
     },
     BUILD_REQUIRES => {
         'Test::More' => '0.98',
