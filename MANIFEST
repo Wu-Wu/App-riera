@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+scripts/riera
+t/s/hiera1.yaml
+t/s/hiera2.yaml
+t/00_compile.t
+t/01_basic.t
+t/02_dump_restore.t
+lib/App/Riera.pm

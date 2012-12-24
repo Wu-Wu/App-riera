@@ -1,20 +1,13 @@
-#!/usr/bin/env perl
+#!perl
 
-#
-# ABSTRACT: Dump/restore the redis-driven Hiera database
-#
-# by Anton Gerasimov me <at> zyxmasta <dot> com, 2012
-#
 use strict;
 use 5.010;
 use Getopt::Long;
 use IO::File;
 use FindBin;
-use lib "$FindBin::Bin/lib";
-use Riera;
+use App::Riera;
 
-my $VERSION = '0.1.4';
-
+my $VERSION = $App::Riera::VERSION;
 
 my $args = {
     'config'   => "$FindBin::Bin/hiera.yaml",
@@ -33,7 +26,7 @@ GetOptions(
 
 $args->{'dump'} = 0 if $args->{'restore'};
 
-my $hr = Riera::->new({config => $args->{config}});
+my $hr = App::Riera->new({ config => $args->{config} });
 
 if ($args->{'dump'}) {
     say "Dump Riera database to " . $args->{'filename'} . '..';

@@ -1,20 +1,46 @@
-package Riera;
+package App::Riera;
 
-#
-# ABSTRACT: Hiera-Redis interface
-#
-# by Anton Gerasimov me <at> zyxmasta <dot> com, 2012
-#
+=pod
 
+=head1 NAME
+
+App::Riera - Dump and restore redis driven Hiera database
+
+=head1 SYNOPSIS
+
+    use App::Riera;
+    my $hr = App::Riera->new({ config => '/usr/local/etc/puppet/hiera.yaml' });
+
+    # dump database
+    my $dump = $hr->to_yaml;
+    ...
+
+    # restore database
+    $hr->from_yaml('/data/backups/riera-dump.yaml');
+    ...
+
+=cut
+
+use 5.010001;
 use strict;
 use Carp ();
 use YAML ();
-use Try::Tiny;
 use Redis ();
-use 5.010;
 
-my $VERSION = '0.1.3';
+our $VERSION = '0.13';
 
+=head1 METHODS
+
+=over 4
+
+=item B<new()>
+
+Construct..
+
+=cut
+
+#
+# Constructor
 sub new {
     my ($class) = shift;
     my $args = shift;
@@ -25,22 +51,25 @@ sub new {
 
     bless $self, $class;
 
-    $self->init;
-}
-
-sub init {
-    my ($self) = @_;
     Carp::croak __PACKAGE__ . ": Hiera config must be provided!" unless $self->{'-config'};
 
     my $hiera_config = $self->_load_yaml($self->{'-config'});
 
     if (ref($hiera_config) eq 'HASH' && ref($hiera_config->{':redis'}) eq 'HASH') {
-        $self->{'-hname'} = $hiera_config->{':redis'}->{':host'} .
-        ($hiera_config->{':redis'}->{':port'} ? ':'.$hiera_config->{':redis'}->{':port'} : '');
-        $self->{'-db'} = defined $hiera_config->{':redis'}->{':db'} ?
-                                 $hiera_config->{':redis'}->{':db'} : 0;
+        $self->{'-server'} = $hiera_config->{':redis'}->{':host'} . ':' .
+                            ($hiera_config->{':redis'}->{':port'}
+                                ? $hiera_config->{':redis'}->{':port'}
+                                : 6379);
+        $self->{'-db'} = defined $hiera_config->{':redis'}->{':db'}
+                            ? $hiera_config->{':redis'}->{':db'}
+                            : 0;
 
-        $self->{'redi'} = Redis::->new(server => $self->{'-hname'}, debug => 0);
+        eval {
+            $self->{'redi'} = Redis->new(server => $self->{'-server'}, debug => 0);
+        };
+        if ($@ && $@ =~ /Could not connect to Redis server/) {
+            Carp::croak __PACKAGE__ . ": Could not connect to Redis server!";
+        }
     }
     else {
         Carp::croak __PACKAGE__ . ": Redis settings not found!";
@@ -49,9 +78,14 @@ sub init {
     $self;
 }
 
-#
-# Dump Hiera database to YAML
-#
+=pod
+
+=item B<to_yaml()>
+
+Dump Hiera database to YAML..
+
+=cut
+
 sub to_yaml {
     my ($self) = @_;
 
@@ -84,9 +118,16 @@ sub to_yaml {
     YAML::Dump($vars);
 }
 
-#
-# Restore Hiera database from YAML
-#
+=pod
+
+=item B<from_yaml()>
+
+Restore Hiera database from YAML..
+
+=back
+
+=cut
+
 sub from_yaml {
     my ($self, $dump) = @_;
     my $vars = $self->_load_yaml($dump);
@@ -113,11 +154,31 @@ sub from_yaml {
 
 #
 # Load YAML from file
-#
 sub _load_yaml {
     my ($self, $yaml) = @_;
     Carp::croak __PACKAGE__ . ": File '" . $yaml . "' does not exists!" unless -e $yaml;
     YAML::LoadFile($yaml);
 }
 
-1; # End of Riera
+=pod
+
+=head1 SEE ALSO
+
+L<Redis>
+
+L<YAML>
+
+=head1 AUTHOR
+
+Anton Gerasimov, E<lt>chim@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Anton Gerasimov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+1;

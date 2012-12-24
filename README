@@ -1,0 +1,39 @@
+NAME
+    App::Riera - Dump and restore redis driven Hiera database
+
+SYNOPSIS
+        use App::Riera;
+        my $hr = App::Riera->new({ config => '/usr/local/etc/puppet/hiera.yaml' });
+
+        # dump database
+        my $dump = $hr->to_yaml;
+        ...
+
+        # restore database
+        $hr->from_yaml('/data/backups/riera-dump.yaml');
+        ...
+
+METHODS
+    new()
+        Construct..
+
+    to_yaml()
+        Dump Hiera database to YAML..
+
+    from_yaml()
+        Restore Hiera database from YAML..
+
+SEE ALSO
+    Redis
+
+    YAML
+
+AUTHOR
+    Anton Gerasimov, <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Anton Gerasimov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
